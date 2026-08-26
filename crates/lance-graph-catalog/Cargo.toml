@@ -1,5 +1,5 @@
 [package]
-name = "lance-graph-catalog"
+name = "tf-lance-graph-catalog"
 version = "0.5.5"
 edition = "2021"
 license = "Apache-2.0"

@@ -18,7 +18,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use lance_graph::{CypherQuery, GraphConfig, Result};
+//! use tf_lance_graph::{CypherQuery, GraphConfig, Result};
 //!
 //! # fn example() -> Result<()> {
 //! let config = GraphConfig::builder()
@@ -59,19 +59,19 @@ pub const MAX_VARIABLE_LENGTH_HOPS: u32 = 20;
 pub use config::{GraphConfig, NodeMapping, RelationshipMapping};
 pub use csr_index::{build_bidirectional_index, CsrIndex, CsrIndexBuilder};
 pub use error::{GraphError, Result};
-pub use lance_graph_catalog::{
+pub use tf_lance_graph_catalog::{
     DirNamespace, GraphSourceCatalog, InMemoryCatalog, SimpleTableSource,
 };
 // Catalog provider re-exports
-pub use lance_graph_catalog::{
-    CatalogError, CatalogInfo, CatalogProvider, CatalogResult, ColumnInfo, Connector,
-    DataSourceFormat, SchemaInfo, TableInfo, TableReader, TableType,
-};
-#[cfg(feature = "unity-catalog")]
-pub use lance_graph_catalog::{UnityCatalogConfig, UnityCatalogProvider};
 pub use lance_vector_search::VectorSearch;
 pub use query::{CypherQuery, ExecutionStrategy, SqlDialect};
 pub use sql_query::SqlQuery;
 #[cfg(feature = "delta")]
 pub use table_readers::DeltaTableReader;
 pub use table_readers::{default_table_readers, ParquetTableReader};
+pub use tf_lance_graph_catalog::{
+    CatalogError, CatalogInfo, CatalogProvider, CatalogResult, ColumnInfo, Connector,
+    DataSourceFormat, SchemaInfo, TableInfo, TableReader, TableType,
+};
+#[cfg(feature = "unity-catalog")]
+pub use tf_lance_graph_catalog::{UnityCatalogConfig, UnityCatalogProvider};

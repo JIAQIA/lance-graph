@@ -87,7 +87,7 @@ query.rs:CypherQuery::new(query)
 
 - `crates/lance-graph` 默认特性:`unity-catalog`、`delta`(deltalake 依赖较重);lib.rs 对它们有 gated re-export,但内部可能无 feature gate 的路径,加 feature 条件时留意。
 - `GraphConfig`(config.rs)是图语义的入口:`.with_node_label()`/`.with_relationship()` 声明节点/关系表的列映射,再经 `CypherQuery::with_config` 传入;缺 config 时仅能跑 SQL 类查询。
-- planner 依赖 `GraphSourceCatalog`(lance-graph-catalog)加载表:`InMemoryCatalog`、`DirNamespace`(目录/本地文件)、Unity Catalog(可注册 Delta/Parquet,见 README 示例)。
+- planner 依赖 `GraphSourceCatalog`(crates/lance-graph-catalog,发布的 crate 名为 `tf-lance-graph-catalog`)加载表:`InMemoryCatalog`、`DirNamespace`(目录/本地文件)、Unity Catalog(可注册 Delta/Parquet,见 README 示例)。
 
 ## Python 绑定
 

@@ -6,9 +6,9 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use lance_graph::sql_catalog::build_context_from_connector;
-use lance_graph::table_readers::default_table_readers;
-use lance_graph::{
+use tf_lance_graph::sql_catalog::build_context_from_connector;
+use tf_lance_graph::table_readers::default_table_readers;
+use tf_lance_graph::{
     CatalogInfo, Connector, SchemaInfo, TableInfo, UnityCatalogConfig, UnityCatalogProvider,
 };
 use pyo3::exceptions::PyRuntimeError;
@@ -104,8 +104,8 @@ impl PyTableInfo {
     #[getter]
     fn table_type(&self) -> &str {
         match self.inner.table_type {
-            lance_graph::TableType::Managed => "MANAGED",
-            lance_graph::TableType::External => "EXTERNAL",
+            tf_lance_graph::TableType::Managed => "MANAGED",
+            tf_lance_graph::TableType::External => "EXTERNAL",
         }
     }
 
@@ -164,7 +164,7 @@ impl PyTableInfo {
 ///
 /// Examples
 /// --------
-/// >>> from lance_graph import UnityCatalog
+/// >>> from tf_lance_graph import UnityCatalog
 /// >>> uc = UnityCatalog("http://localhost:8080/api/2.1/unity-catalog")
 /// >>> catalogs = uc.list_catalogs()
 /// >>> engine = uc.create_sql_engine("unity", "default")

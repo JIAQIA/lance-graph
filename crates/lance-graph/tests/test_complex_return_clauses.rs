@@ -1,10 +1,10 @@
 use arrow_array::{Int64Array, RecordBatch, StringArray};
 use arrow_schema::{DataType, Field, Schema};
 use lance_arrow::SchemaExt;
-use lance_graph::config::GraphConfig;
-use lance_graph::{CypherQuery, ExecutionStrategy, NodeMapping};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::config::GraphConfig;
+use tf_lance_graph::{CypherQuery, ExecutionStrategy, NodeMapping};
 
 // This test suite validates complex RETURN clause scenarios
 //

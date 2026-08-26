@@ -1,6 +1,6 @@
 use datafusion::execution::context::SessionContext;
-use lance_graph::config::GraphConfig;
-use lance_graph::query::CypherQuery;
+use tf_lance_graph::config::GraphConfig;
+use tf_lance_graph::query::CypherQuery;
 
 #[tokio::test]
 async fn test_execute_with_context_csv_simple() {

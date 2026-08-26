@@ -23,11 +23,11 @@ use std::sync::Arc;
 /// # Example
 ///
 /// ```no_run
-/// use lance_graph::SqlQuery;
+/// use tf_lance_graph::SqlQuery;
 /// use arrow_array::RecordBatch;
 /// use std::collections::HashMap;
 ///
-/// # async fn example() -> lance_graph::Result<()> {
+/// # async fn example() -> tf_lance_graph::Result<()> {
 /// let mut datasets: HashMap<String, RecordBatch> = HashMap::new();
 /// // datasets.insert("person".to_string(), person_batch);
 ///

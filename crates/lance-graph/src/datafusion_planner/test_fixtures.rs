@@ -6,8 +6,8 @@
 use crate::config::GraphConfig;
 use crate::logical_plan::LogicalOperator;
 use arrow_schema::{DataType, Field, Schema};
-use lance_graph_catalog::{InMemoryCatalog, SimpleTableSource};
 use std::sync::Arc;
+use tf_lance_graph_catalog::{InMemoryCatalog, SimpleTableSource};
 
 pub fn person_schema() -> Arc<Schema> {
     Arc::new(Schema::new(vec![
@@ -17,7 +17,7 @@ pub fn person_schema() -> Arc<Schema> {
     ]))
 }
 
-pub fn make_catalog() -> Arc<dyn lance_graph_catalog::GraphSourceCatalog> {
+pub fn make_catalog() -> Arc<dyn tf_lance_graph_catalog::GraphSourceCatalog> {
     let person_src = Arc::new(SimpleTableSource::new(person_schema()));
     let knows_schema = Arc::new(Schema::new(vec![
         Field::new("src_person_id", DataType::Int64, false),

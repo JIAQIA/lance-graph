@@ -1,5 +1,5 @@
 [package]
-name = "lance-graph"
+name = "tf-lance-graph"
 version = "0.5.5"
 edition = "2021"
 license = "Apache-2.0"
@@ -30,7 +30,7 @@ datafusion-expr = "50.3"
 datafusion-sql = "50.3"
 datafusion-functions-aggregate = "50.3"
 futures = "0.3"
-lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.5.5" }
+tf-lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.5.5" }
 lance = { workspace = true }
 lance-linalg = { workspace = true }
 lance-namespace = { workspace = true }
@@ -43,7 +43,7 @@ url = { version = "2", optional = true }
 
 [features]
 default = ["unity-catalog", "delta"]
-unity-catalog = ["lance-graph-catalog/unity-catalog"]
+unity-catalog = ["tf-lance-graph-catalog/unity-catalog"]
 delta = ["dep:deltalake", "dep:url"]
 
 [dev-dependencies]

@@ -23,7 +23,7 @@ use arrow_array::{RecordBatch, RecordBatchReader};
 use arrow_schema::Schema;
 use datafusion::datasource::{DefaultTableSource, MemTable};
 use datafusion::execution::context::SessionContext;
-use lance_graph::{
+use tf_lance_graph::{
     ast::{DistanceMetric as RustDistanceMetric, GraphPattern, ReadingClause},
     CypherQuery as RustCypherQuery, ExecutionStrategy as RustExecutionStrategy,
     GraphConfig as RustGraphConfig, GraphError as RustGraphError, InMemoryCatalog,
@@ -121,7 +121,7 @@ impl From<DistanceMetric> for RustDistanceMetric {
 ///
 /// Examples
 /// --------
-/// >>> from lance_graph import VectorSearch, DistanceMetric
+/// >>> from tf_lance_graph import VectorSearch, DistanceMetric
 /// >>>
 /// >>> # Basic vector search on a PyArrow table
 /// >>> results = VectorSearch("embedding") \
@@ -361,7 +361,7 @@ impl GraphConfig {
 #[pyclass(name = "GraphConfigBuilder", module = "lance.graph")]
 #[derive(Clone)]
 pub struct GraphConfigBuilder {
-    inner: lance_graph::config::GraphConfigBuilder,
+    inner: tf_lance_graph::config::GraphConfigBuilder,
 }
 
 #[pymethods]
@@ -726,7 +726,7 @@ impl CypherQuery {
     ///
     /// Examples
     /// --------
-    /// >>> from lance_graph import CypherQuery, VectorSearch, DistanceMetric, GraphConfig
+    /// >>> from tf_lance_graph import CypherQuery, VectorSearch, DistanceMetric, GraphConfig
     /// >>>
     /// >>> config = GraphConfig.builder().with_node_label("Document", "id").build()
     /// >>> query = CypherQuery("MATCH (d:Document) WHERE d.category = 'tech' RETURN d.id, d.name, d.embedding")
@@ -1140,7 +1140,7 @@ fn record_batch_to_python_table(
 ///
 /// Examples
 /// --------
-/// >>> from lance_graph import CypherEngine, GraphConfig
+/// >>> from tf_lance_graph import CypherEngine, GraphConfig
 /// >>> import pyarrow as pa
 /// >>>
 /// >>> # Setup
@@ -1164,7 +1164,7 @@ fn record_batch_to_python_table(
 #[pyclass(name = "CypherEngine", module = "lance.graph")]
 pub struct CypherEngine {
     config: RustGraphConfig,
-    catalog: Arc<dyn lance_graph::GraphSourceCatalog>,
+    catalog: Arc<dyn tf_lance_graph::GraphSourceCatalog>,
     context: Arc<datafusion::execution::context::SessionContext>,
 }
 
@@ -1366,7 +1366,7 @@ impl CypherEngine {
 /// Examples
 /// --------
 /// >>> import pyarrow as pa
-/// >>> from lance_graph import SqlQuery
+/// >>> from tf_lance_graph import SqlQuery
 /// >>>
 /// >>> person = pa.table({"id": [1, 2], "name": ["Alice", "Bob"], "age": [28, 34]})
 /// >>> query = SqlQuery("SELECT name, age FROM person WHERE age > 30")
@@ -1468,7 +1468,7 @@ impl SqlQuery {
 ///
 /// Examples
 /// --------
-/// >>> from lance_graph import SqlEngine
+/// >>> from tf_lance_graph import SqlEngine
 /// >>> import pyarrow as pa
 /// >>>
 /// >>> datasets = {

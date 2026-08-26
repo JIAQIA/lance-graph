@@ -9,6 +9,11 @@ This repository contains:
   - `lance_graph` – thin wrapper around the Rust query engine
   - `knowledge_graph` – Lance-backed knowledge graph CLI, API, and utilities
 
+This fork publishes its crates as `tf-lance-graph` / `tf-lance-graph-catalog`
+(crates.io) and its Python distribution as `tf-lance-graph` (PyPI), because the
+`lance-graph` names/package are owned by the upstream project. The Python
+import name remains `lance_graph`.
+
 See `docs/project_structure.md` for the proposed workspace-based structure from
 issue #92.
 
@@ -27,7 +32,7 @@ is not API-stable: `DatasetBuilder::from_namespace` changed from 3 arguments in
 1.0.1 to 2 in 1.0.4, so mixing 1.0.x patch versions can fail to compile or fail
 at runtime. Bumping any of them requires re-verifying the full stack.
 
-Rust users that depend on `lance-graph-catalog` directly should align their own
+Rust users that depend on `tf-lance-graph-catalog` directly should align their own
 `lance-namespace` to `=1.0.4`. If a different 1.0.x version is pulled in, Cargo
 may resolve two copies, and the `dyn LanceNamespace` trait identity is
 per-crate-version (symptoms: "trait not implemented" or type mismatches).

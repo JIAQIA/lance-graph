@@ -16,9 +16,9 @@ use datafusion_sql::unparser::dialect::{
     CustomDialect, DefaultDialect, MySqlDialect, PostgreSqlDialect, SqliteDialect,
 };
 use datafusion_sql::unparser::Unparser;
-use lance_graph_catalog::DirNamespace;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use tf_lance_graph_catalog::DirNamespace;
 
 /// SQL dialect to use when generating SQL from Cypher queries.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -211,7 +211,7 @@ impl CypherQuery {
     /// ```ignore
     /// use std::collections::HashMap;
     /// use arrow::record_batch::RecordBatch;
-    /// use lance_graph::query::CypherQuery;
+    /// use tf_lance_graph::query::CypherQuery;
     ///
     /// // Create in-memory datasets
     /// let mut datasets = HashMap::new();
@@ -306,7 +306,7 @@ impl CypherQuery {
     /// ```ignore
     /// use std::collections::HashMap;
     /// use arrow::record_batch::RecordBatch;
-    /// use lance_graph::query::CypherQuery;
+    /// use tf_lance_graph::query::CypherQuery;
     ///
     /// // Create in-memory datasets
     /// let mut datasets = HashMap::new();
@@ -419,7 +419,7 @@ impl CypherQuery {
     /// ```ignore
     /// use datafusion::execution::context::SessionContext;
     /// use datafusion::prelude::CsvReadOptions;
-    /// use lance_graph::{CypherQuery, GraphConfig};
+    /// use tf_lance_graph::{CypherQuery, GraphConfig};
     ///
     /// // Step 1: Create GraphConfig
     /// let config = GraphConfig::builder()
@@ -447,8 +447,8 @@ impl CypherQuery {
         ctx: datafusion::execution::context::SessionContext,
     ) -> Result<arrow::record_batch::RecordBatch> {
         use datafusion::datasource::DefaultTableSource;
-        use lance_graph_catalog::InMemoryCatalog;
         use std::sync::Arc;
+        use tf_lance_graph_catalog::InMemoryCatalog;
 
         let config = self.require_config()?;
 
@@ -514,8 +514,8 @@ impl CypherQuery {
     /// ```ignore
     /// use std::sync::Arc;
     /// use datafusion::execution::context::SessionContext;
-    /// use lance_graph::InMemoryCatalog;
-    /// use lance_graph::query::CypherQuery;
+    /// use tf_lance_graph::InMemoryCatalog;
+    /// use tf_lance_graph::query::CypherQuery;
     ///
     /// // Create custom catalog
     /// let catalog = InMemoryCatalog::new()
@@ -532,7 +532,7 @@ impl CypherQuery {
     /// ```
     pub async fn execute_with_catalog_and_context(
         &self,
-        catalog: std::sync::Arc<dyn lance_graph_catalog::GraphSourceCatalog>,
+        catalog: std::sync::Arc<dyn tf_lance_graph_catalog::GraphSourceCatalog>,
         ctx: datafusion::execution::context::SessionContext,
     ) -> Result<arrow::record_batch::RecordBatch> {
         use arrow::compute::concat_batches;
@@ -608,13 +608,13 @@ impl CypherQuery {
         &self,
         datasets: HashMap<String, arrow::record_batch::RecordBatch>,
     ) -> Result<(
-        lance_graph_catalog::InMemoryCatalog,
+        tf_lance_graph_catalog::InMemoryCatalog,
         datafusion::execution::context::SessionContext,
     )> {
         use datafusion::datasource::{DefaultTableSource, MemTable};
         use datafusion::execution::context::SessionContext;
-        use lance_graph_catalog::InMemoryCatalog;
         use std::sync::Arc;
+        use tf_lance_graph_catalog::InMemoryCatalog;
 
         if datasets.is_empty() {
             return Err(GraphError::ConfigError {
@@ -670,14 +670,14 @@ impl CypherQuery {
         &self,
         namespace: std::sync::Arc<dyn lance_namespace::LanceNamespace + Send + Sync>,
     ) -> Result<(
-        lance_graph_catalog::InMemoryCatalog,
+        tf_lance_graph_catalog::InMemoryCatalog,
         datafusion::execution::context::SessionContext,
     )> {
         use datafusion::datasource::{DefaultTableSource, TableProvider};
         use datafusion::execution::context::SessionContext;
         use lance::datafusion::LanceTableProvider;
-        use lance_graph_catalog::InMemoryCatalog;
         use std::sync::Arc;
+        use tf_lance_graph_catalog::InMemoryCatalog;
 
         let config = self.require_config()?;
 
@@ -784,7 +784,7 @@ impl CypherQuery {
     /// Internal helper to explain the query execution plan with explicit catalog and session context
     async fn explain_internal(
         &self,
-        catalog: std::sync::Arc<dyn lance_graph_catalog::GraphSourceCatalog>,
+        catalog: std::sync::Arc<dyn tf_lance_graph_catalog::GraphSourceCatalog>,
         ctx: datafusion::execution::context::SessionContext,
     ) -> Result<String> {
         // Create all plans (phases 1-4)
@@ -801,7 +801,7 @@ impl CypherQuery {
     /// DataFusion logical planning) without creating the physical plan.
     fn create_logical_plans(
         &self,
-        catalog: std::sync::Arc<dyn lance_graph_catalog::GraphSourceCatalog>,
+        catalog: std::sync::Arc<dyn tf_lance_graph_catalog::GraphSourceCatalog>,
     ) -> Result<(
         crate::logical_plan::LogicalOperator,
         datafusion::logical_expr::LogicalPlan,
@@ -836,7 +836,7 @@ impl CypherQuery {
     /// Helper to create all plans (graph logical, DataFusion logical, physical)
     async fn create_plans(
         &self,
-        catalog: std::sync::Arc<dyn lance_graph_catalog::GraphSourceCatalog>,
+        catalog: std::sync::Arc<dyn tf_lance_graph_catalog::GraphSourceCatalog>,
         ctx: &datafusion::execution::context::SessionContext,
     ) -> Result<(
         crate::logical_plan::LogicalOperator,
@@ -1099,8 +1099,8 @@ impl CypherQuery {
     ///
     /// # Example
     /// ```ignore
-    /// use lance_graph::{CypherQuery, VectorSearch};
-    /// use lance_graph::ast::DistanceMetric;
+    /// use tf_lance_graph::{CypherQuery, VectorSearch};
+    /// use tf_lance_graph::ast::DistanceMetric;
     ///
     /// let results = query
     ///     .execute_with_vector_rerank(

@@ -5,9 +5,9 @@
 
 use arrow_array::{Float64Array, Int64Array, RecordBatch, StringArray};
 use arrow_schema::{DataType, Field, Schema};
-use lance_graph::SqlQuery;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::SqlQuery;
 
 fn person_batch() -> RecordBatch {
     let schema = Arc::new(Schema::new(vec![

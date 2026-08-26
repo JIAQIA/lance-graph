@@ -1,9 +1,9 @@
 use arrow_array::{Int64Array, RecordBatch, StringArray};
 use arrow_schema::{DataType, Field, Schema};
-use lance_graph::config::GraphConfig;
-use lance_graph::query::CypherQuery;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::config::GraphConfig;
+use tf_lance_graph::query::CypherQuery;
 
 /// Helper to create a Person dataset
 fn create_person_dataset() -> RecordBatch {

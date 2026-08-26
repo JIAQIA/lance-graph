@@ -10,8 +10,8 @@ use super::analysis::PlanningContext;
 use super::DataFusionPlanner;
 use crate::config::{NodeMapping, RelationshipMapping};
 use crate::error::Result;
-use lance_graph_catalog::GraphSourceCatalog;
 use std::sync::Arc;
+use tf_lance_graph_catalog::GraphSourceCatalog;
 
 impl DataFusionPlanner {
     /// Get relationship mapping from config (case-insensitive)

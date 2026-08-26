@@ -8,9 +8,9 @@
 use arrow::array::{Int32Array, StringArray};
 use arrow::datatypes::{DataType, Field, Schema};
 use arrow::record_batch::RecordBatch;
-use lance_graph::{CypherQuery, GraphConfig, SqlDialect};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::{CypherQuery, GraphConfig, SqlDialect};
 
 fn create_person_table() -> RecordBatch {
     let schema = Arc::new(Schema::new(vec![

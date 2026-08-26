@@ -39,7 +39,7 @@ use crate::table_reader::TableReader;
 /// # Example
 ///
 /// ```no_run
-/// # use lance_graph_catalog::connector::Connector;
+/// # use tf_lance_graph_catalog::connector::Connector;
 /// # use std::collections::HashMap;
 /// # fn example() {
 /// // let connector = Connector::new(catalog, readers)

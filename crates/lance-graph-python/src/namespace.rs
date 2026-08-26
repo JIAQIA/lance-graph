@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use lance_graph::DirNamespace;
+use tf_lance_graph::DirNamespace;
 use pyo3::prelude::*;
 
 #[pyclass(name = "DirNamespace", module = "lance.graph")]

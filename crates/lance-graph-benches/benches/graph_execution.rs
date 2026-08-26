@@ -22,8 +22,8 @@ use arrow_schema::{DataType, Field, Schema as ArrowSchema};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use futures::TryStreamExt;
 use lance::dataset::{Dataset, WriteMode, WriteParams};
-use lance_graph::{CypherQuery, GraphConfig};
 use tempfile::TempDir;
+use tf_lance_graph::{CypherQuery, GraphConfig};
 
 fn create_people_batch() -> RecordBatch {
     let schema = Arc::new(ArrowSchema::new(vec![

@@ -6,7 +6,7 @@ publish = false
 description = "Benchmarks for lance-graph (not published)"
 
 [dependencies]
-lance-graph = { path = "../lance-graph" }
+tf-lance-graph = { path = "../lance-graph" }
 lance = { workspace = true }
 arrow-array = "56.2"
 arrow-schema = "56.2"

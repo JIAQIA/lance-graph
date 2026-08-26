@@ -9,7 +9,7 @@
 
 use crate::error::{GraphError, Result};
 use datafusion::execution::context::SessionContext;
-use lance_graph_catalog::connector::Connector;
+use tf_lance_graph_catalog::connector::Connector;
 
 /// Build a DataFusion `SessionContext` with all tables from a catalog schema
 /// auto-registered.
@@ -21,8 +21,8 @@ use lance_graph_catalog::connector::Connector;
 /// # Example
 ///
 /// ```no_run
-/// # use lance_graph::sql_catalog::build_context_from_connector;
-/// # use lance_graph_catalog::Connector;
+/// # use tf_lance_graph::sql_catalog::build_context_from_connector;
+/// # use tf_lance_graph_catalog::Connector;
 /// # async fn example(connector: &Connector) {
 /// let ctx = build_context_from_connector(connector, "unity", "default")
 ///     .await

@@ -17,9 +17,9 @@ use crate::error::Result;
 use datafusion::logical_expr::{
     col, BinaryExpr, Expr, JoinType, LogicalPlan, LogicalPlanBuilder, Operator, TableSource,
 };
-use lance_graph_catalog::GraphSourceCatalog;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph_catalog::GraphSourceCatalog;
 
 /// Parameters for joining source node to relationship
 pub(crate) struct SourceJoinParams<'a> {

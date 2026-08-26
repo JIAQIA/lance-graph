@@ -5,11 +5,11 @@
 
 use arrow_array::{Array, FixedSizeListArray, Float32Array, Int64Array, RecordBatch, StringArray};
 use arrow_schema::{DataType, Field, FieldRef, Schema};
-use lance_graph::ast::DistanceMetric;
-use lance_graph::config::GraphConfig;
-use lance_graph::{CypherQuery, Result, VectorSearch};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::ast::DistanceMetric;
+use tf_lance_graph::config::GraphConfig;
+use tf_lance_graph::{CypherQuery, Result, VectorSearch};
 
 /// Helper function to create a test graph with vector embeddings
 fn create_test_graph_with_embeddings() -> (GraphConfig, HashMap<String, RecordBatch>) {

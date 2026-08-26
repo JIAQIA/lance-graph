@@ -5,9 +5,9 @@
 
 use arrow_array::{BooleanArray, Int64Array, RecordBatch, StringArray};
 use arrow_schema::{DataType, Field, Schema};
-use lance_graph::{CypherQuery, ExecutionStrategy, GraphConfig};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::{CypherQuery, ExecutionStrategy, GraphConfig};
 
 /// Helper to create a test person dataset with mixed-case properties
 fn create_test_person_dataset() -> RecordBatch {

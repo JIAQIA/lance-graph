@@ -8,9 +8,9 @@
 use arrow::array::{Int32Array, StringArray};
 use arrow::datatypes::{DataType, Field, Schema};
 use arrow::record_batch::RecordBatch;
-use lance_graph::{CypherQuery, GraphConfig};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tf_lance_graph::{CypherQuery, GraphConfig};
 
 /// Helper to create a simple Person table
 fn create_person_table() -> RecordBatch {

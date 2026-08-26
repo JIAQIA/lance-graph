@@ -12,10 +12,10 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use datafusion::execution::context::SessionContext;
 
-use lance_graph_catalog::catalog_provider::{
+use tf_lance_graph_catalog::catalog_provider::{
     CatalogError, CatalogResult, DataSourceFormat, TableInfo,
 };
-use lance_graph_catalog::table_reader::TableReader;
+use tf_lance_graph_catalog::table_reader::TableReader;
 
 /// Reads Parquet tables using DataFusion's built-in `register_parquet()`.
 pub struct ParquetTableReader;

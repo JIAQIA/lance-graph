@@ -17,7 +17,7 @@ use std::hash::{Hash, Hasher};
 /// # Examples
 ///
 /// ```
-/// use lance_graph::case_insensitive::CaseInsensitiveStr;
+/// use tf_lance_graph::case_insensitive::CaseInsensitiveStr;
 ///
 /// let a = CaseInsensitiveStr::new("Person");
 /// let b = CaseInsensitiveStr::new("person");
@@ -97,7 +97,7 @@ pub type CaseInsensitiveMap<V> = HashMap<CaseInsensitiveStr, V>;
 /// # Examples
 ///
 /// ```
-/// use lance_graph::case_insensitive::qualify_column;
+/// use tf_lance_graph::case_insensitive::qualify_column;
 ///
 /// assert_eq!(qualify_column("Person", "Name"), "person__name");
 /// assert_eq!(qualify_column("p", "fullName"), "p__fullname");
@@ -131,7 +131,7 @@ pub fn qualify_column(alias: &str, property: &str) -> String {
 ///
 /// ```
 /// use std::collections::HashMap;
-/// use lance_graph::case_insensitive::CaseInsensitiveLookup;
+/// use tf_lance_graph::case_insensitive::CaseInsensitiveLookup;
 ///
 /// let mut map = HashMap::new();
 /// map.insert("Person".to_string(), 1);

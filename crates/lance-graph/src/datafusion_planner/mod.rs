@@ -33,8 +33,8 @@ use crate::config::GraphConfig;
 use crate::error::Result;
 use crate::logical_plan::LogicalOperator;
 use datafusion::logical_expr::LogicalPlan;
-use lance_graph_catalog::GraphSourceCatalog;
 use std::sync::Arc;
+use tf_lance_graph_catalog::GraphSourceCatalog;
 
 /// Planner abstraction for graph-to-physical planning
 pub trait GraphPhysicalPlanner {

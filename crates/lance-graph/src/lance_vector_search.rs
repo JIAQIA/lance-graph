@@ -16,8 +16,8 @@
 //! # Example
 //!
 //! ```ignore
-//! use lance_graph::lance_vector_search::VectorSearch;
-//! use lance_graph::ast::DistanceMetric;
+//! use tf_lance_graph::lance_vector_search::VectorSearch;
+//! use tf_lance_graph::ast::DistanceMetric;
 //!
 //! // Step 1: Run Cypher query to get candidates
 //! let candidates = query.execute(datasets, None).await?;

@@ -3,7 +3,7 @@
 
 //! Integration tests for UnityCatalogProvider using wiremock to mock the REST API.
 
-use lance_graph_catalog::{
+use tf_lance_graph_catalog::{
     CatalogProvider, DataSourceFormat, TableType, UnityCatalogConfig, UnityCatalogProvider,
 };
 use wiremock::matchers::{method, path, query_param};
