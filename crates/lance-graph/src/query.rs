@@ -17,7 +17,6 @@ use datafusion_sql::unparser::dialect::{
 };
 use datafusion_sql::unparser::Unparser;
 use lance_graph_catalog::DirNamespace;
-use lance_namespace::models::DescribeTableRequest;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
@@ -707,35 +706,31 @@ impl CypherQuery {
         let mut providers: HashMap<String, Arc<dyn TableProvider>> = HashMap::new();
 
         for table_name in required_tables {
-            let mut request = DescribeTableRequest::new();
-            request.id = Some(vec![table_name.clone()]);
-
-            let response =
-                namespace
-                    .describe_table(request)
-                    .await
-                    .map_err(|e| GraphError::ConfigError {
-                        message: format!(
-                            "Namespace failed to resolve table '{}': {}",
-                            table_name, e
-                        ),
-                        location: snafu::Location::new(file!(), line!(), column!()),
-                    })?;
-
-            let location = response.location.ok_or_else(|| GraphError::ConfigError {
+            // TFROB-806: namespace-aware open — `DatasetBuilder::from_namespace`
+            // merges explicit `DescribeTableResponse.storage_options` (carried by
+            // `DirNamespace::new_with_storage_options`) into the object store
+            // config, enabling fully-explicit remote storage (MinIO/S3 custom
+            // endpoint) with zero ambient AWS env. The 2-arg signature (lance
+            // >=1.0.4) always applies namespace options over user-provided ones;
+            // the older 3-arg `ignore` flag was removed by lance.
+            let dataset = lance::dataset::builder::DatasetBuilder::from_namespace(
+                namespace.clone(),
+                vec![table_name.clone()],
+            )
+            .await
+            .map_err(|e| GraphError::ConfigError {
                 message: format!(
-                    "Namespace did not provide a location for table '{}'",
-                    table_name
+                    "Namespace failed to resolve table '{}': {}",
+                    table_name, e
                 ),
                 location: snafu::Location::new(file!(), line!(), column!()),
+            })?
+            .load()
+            .await
+            .map_err(|e| GraphError::ConfigError {
+                message: format!("Failed to open dataset for table '{}': {}", table_name, e),
+                location: snafu::Location::new(file!(), line!(), column!()),
             })?;
-
-            let dataset = lance::dataset::Dataset::open(&location)
-                .await
-                .map_err(|e| GraphError::ConfigError {
-                    message: format!("Failed to open dataset for table '{}': {}", table_name, e),
-                    location: snafu::Location::new(file!(), line!(), column!()),
-                })?;
 
             let dataset = Arc::new(dataset);
             let provider: Arc<dyn TableProvider> =
