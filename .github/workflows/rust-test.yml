@@ -39,19 +39,23 @@ jobs:
           shared-key: "lance-graph-deps"
           workspaces: |
             crates/lance-graph
+            crates/lance-graph-catalog
+            crates/lance-graph-benches
             crates/lance-graph-python
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y protobuf-compiler
       - name: Build tests
-        run: cargo test --manifest-path crates/lance-graph/Cargo.toml --no-run
+        run: cargo test --workspace --no-run
       - name: Run unit tests
-        run: cargo test --manifest-path crates/lance-graph/Cargo.toml --lib
+        run: cargo test --workspace --lib
       - name: Run integration tests
-        run: cargo test --manifest-path crates/lance-graph/Cargo.toml --tests
+        run: cargo test --workspace --tests
       - name: Run doc tests
-        run: cargo test --manifest-path crates/lance-graph/Cargo.toml --doc
+        run: cargo test --workspace --doc
+      - name: Check benchmarks
+        run: cargo check --workspace --benches
 
   test-with-coverage:
     runs-on: ubuntu-24.04
@@ -67,6 +71,8 @@ jobs:
           shared-key: "lance-graph-deps"
           workspaces: |
             crates/lance-graph
+            crates/lance-graph-catalog
+            crates/lance-graph-benches
             crates/lance-graph-python
       - name: Install dependencies
         run: |
@@ -78,7 +84,7 @@ jobs:
         env:
           CARGO_BUILD_JOBS: "2"
         run: |
-          cargo llvm-cov --manifest-path crates/lance-graph/Cargo.toml --lib --lcov --output-path lcov.info
+          cargo llvm-cov --workspace --lib --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:

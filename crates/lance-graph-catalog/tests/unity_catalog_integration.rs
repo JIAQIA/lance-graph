@@ -3,8 +3,6 @@
 
 //! Integration tests for UnityCatalogProvider using wiremock to mock the REST API.
 
-use std::collections::HashMap;
-
 use lance_graph_catalog::{
     CatalogProvider, DataSourceFormat, TableType, UnityCatalogConfig, UnityCatalogProvider,
 };

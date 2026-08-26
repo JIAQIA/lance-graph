@@ -1,6 +1,6 @@
 [package]
 name = "lance-graph"
-version = "0.5.4"
+version = "0.5.5"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Lance Devs <dev@lancedb.com>"]
@@ -30,10 +30,10 @@ datafusion-expr = "50.3"
 datafusion-sql = "50.3"
 datafusion-functions-aggregate = "50.3"
 futures = "0.3"
-lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.5.4" }
-lance = "=1.0.4"
-lance-linalg = "=1.0.4"
-lance-namespace = "=1.0.4"
+lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.5.5" }
+lance = { workspace = true }
+lance-linalg = { workspace = true }
+lance-namespace = { workspace = true }
 nom = "7.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

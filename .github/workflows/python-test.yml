@@ -7,6 +7,8 @@ on:
     paths:
       - python/**
       - crates/lance-graph/**
+      - crates/lance-graph-catalog/**
+      - crates/lance-graph-python/**
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/python-test.yml
@@ -40,28 +42,50 @@ jobs:
           shared-key: "lance-graph-deps"
           workspaces: |
             crates/lance-graph
+            crates/lance-graph-catalog
+            crates/lance-graph-benches
             crates/lance-graph-python
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y protobuf-compiler
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v4
       - name: Create virtual environment and install dependencies
         working-directory: python
         run: |
           uv venv
           source .venv/bin/activate
           uv pip install maturin[patchelf]
-          # Install test dependencies only (skip editable install to avoid double-building Rust)
-          uv pip install pytest pyarrow pandas ruff
+          # Test dependencies + the project's runtime deps (knowledge_graph
+          # imports yaml/fastapi/uvicorn/fsspec/openai/gcsfs at collection
+          # time). Skip editable install to avoid double-building Rust.
+          uv pip install pytest pyarrow pandas ruff pylance==10.0.0 \
+            fastapi uvicorn pydantic pyyaml fsspec gcsfs openai
       - name: Build Python extension
         working-directory: python
         run: |
           source .venv/bin/activate
           maturin develop
+      - name: Start MinIO (storage_options integration test)
+        run: |
+          docker run -d --name minio -p 127.0.0.1:9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio server /data
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:9000/minio/health/live >/dev/null; then ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" != "1" ]; then docker logs minio; exit 1; fi
+          docker run --rm --network host --entrypoint /bin/sh minio/mc -c \
+            "mc alias set local http://127.0.0.1:9000 minioadmin minioadmin >/dev/null && mc mb local/lance-storage-options-test"
       - name: Run tests
         working-directory: python
+        env:
+          LANCE_STORAGE_ENDPOINT: http://127.0.0.1:9000
+          LANCE_STORAGE_ACCESS_KEY: minioadmin
+          LANCE_STORAGE_SECRET_KEY: minioadmin
         run: |
           source .venv/bin/activate
           pytest python/tests/ -v
@@ -83,7 +107,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v4
       - name: Install linting tools
         working-directory: python
         run: |

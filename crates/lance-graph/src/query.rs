@@ -719,10 +719,7 @@ impl CypherQuery {
             )
             .await
             .map_err(|e| GraphError::ConfigError {
-                message: format!(
-                    "Namespace failed to resolve table '{}': {}",
-                    table_name, e
-                ),
+                message: format!("Namespace failed to resolve table '{}': {}", table_name, e),
                 location: snafu::Location::new(file!(), line!(), column!()),
             })?
             .load()

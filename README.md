@@ -18,6 +18,21 @@ issue #92.
 - Python 3.11
 - [`uv`](https://docs.astral.sh/uv/) available on your `PATH`
 
+## Version constraints
+
+The `lance` family (`lance`, `lance-linalg`, `lance-namespace`) is pinned
+exactly to `=1.0.4` across the workspace (via `[workspace.dependencies]`) and in
+the Python wheel build (`crates/lance-graph-python/Cargo.lock`). The 1.0.x line
+is not API-stable: `DatasetBuilder::from_namespace` changed from 3 arguments in
+1.0.1 to 2 in 1.0.4, so mixing 1.0.x patch versions can fail to compile or fail
+at runtime. Bumping any of them requires re-verifying the full stack.
+
+Rust users that depend on `lance-graph-catalog` directly should align their own
+`lance-namespace` to `=1.0.4`. If a different 1.0.x version is pulled in, Cargo
+may resolve two copies, and the `dyn LanceNamespace` trait identity is
+per-crate-version (symptoms: "trait not implemented" or type mismatches).
+Check with `cargo tree -d | grep lance-namespace`.
+
 ## Rust crate quick start
 
 ```bash

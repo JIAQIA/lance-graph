@@ -28,7 +28,7 @@ jobs:
         with:
           components: rustfmt
       - name: Check formatting
-        run: cargo fmt --manifest-path crates/lance-graph/Cargo.toml -- --check
+        run: cargo fmt --all -- --check
 
   clippy:
     runs-on: ubuntu-24.04
@@ -40,13 +40,15 @@ jobs:
           shared-key: "lance-graph-deps"
           workspaces: |
             crates/lance-graph
+            crates/lance-graph-catalog
+            crates/lance-graph-benches
             crates/lance-graph-python
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y protobuf-compiler
       - name: Clippy
-        run: cargo clippy --manifest-path crates/lance-graph/Cargo.toml --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
   typos:
     name: Spell Check

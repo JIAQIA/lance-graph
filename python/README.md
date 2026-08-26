@@ -12,8 +12,12 @@ Lance Graph combines a Rust-powered Cypher query engine with Python APIs for:
 ## Installation
 
 ```bash
-pip install lance-graph
+pip install tf-lance-graph
 ```
+
+> Previously published as `lance-graph` by the upstream project (which is no
+> longer maintained). This fork's releases are published under `tf-lance-graph`;
+> the Python import name remains `lance_graph`.
 
 ## Quick Start
 
@@ -308,5 +312,5 @@ Apache 2.0
 
 - [GitHub](https://github.com/lancedb/lance-graph)
 - [Documentation](https://deepwiki.com/lancedb/lance-graph)
-- [PyPI](https://pypi.org/project/lance-graph/)
+- [PyPI](https://pypi.org/project/tf-lance-graph/)
 - [LanceDB](https://lancedb.com/)

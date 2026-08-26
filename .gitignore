@@ -20,6 +20,7 @@ __pycache__/
 *.whl
 /build/
 /dist/
+python/dist/
 python/python/lance_graph/*.so
 python/python/lance_graph/*.pyd
 python/target/

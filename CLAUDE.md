@@ -99,10 +99,10 @@ query.rs:CypherQuery::new(query)
 
 - Rust:单元测试写在模块内 `#[cfg(test)]`;集成测试在 `crates/lance-graph/tests/*.rs`(覆盖 DataFusion 场景、向量检索、to_sql、大小写、EXPLAIN 等);catalog crate 有 `tests/unity_catalog_integration.rs`。
 - Python:`python/python/tests/test_*.py`;pytest markers 定义于 pyproject(`integration`/`slow`/`gpu` 等)。
-- CI(.github/workflows):`style.yml` = fmt + clippy `-D warnings` + typos;`rust-test.yml` = `--lib`/`--tests`/`--doc` 三挡;`python-test.yml` = Python 3.11 + maturin + pytest。改这两个 crate 下 Rust 代码时,需保证本地这些命令全绿,否则 CI 必挂。
+- CI(.github/workflows):`style.yml` = fmt(`cargo fmt --all -- --check`)+ clippy(`cargo clippy --workspace --all-targets -- -D warnings`)+ typos;`rust-test.yml` = workspace 级 `--lib`/`--tests`/`--doc` 三挡;`python-test.yml` = Python 3.11 + maturin + pytest。改 `crates/` 下 Rust 代码时,需保证本地这些命令全绿,否则 CI 必挂。
 
 ## 版本与发布
 
-- 版本号由 `ci/bump_version.py` + `.bumpversion.toml` 管理,一次同步 4 处:`crates/*/Cargo.toml` ×3 和 `python/pyproject.toml`。当前 0.5.4(以 `.bumpversion.toml` 为准)。
+- 版本号由 `ci/bump_version.py` + `.bumpversion.toml` 管理,一次同步 4 处:`crates/*/Cargo.toml` ×3 和 `python/pyproject.toml`(bump 后脚本自动 `cargo check` 刷新两个 Cargo.lock)。当前 0.5.5(以 `.bumpversion.toml` 为准)。
 - 发布流程在 `release.yml` / `rust-publish.yml` / `python-publish.yml`(maturin build + PyPI/crates.io)。
 - Commit message 跟随历史风格(`feat(graph):`、`docs:`、`refactor(query):` 等,详见 AGENTS.md)。

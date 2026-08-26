@@ -119,7 +119,10 @@ mod tests {
 
         let response = namespace.describe_table(request).await.unwrap();
         let carried = response.storage_options.expect("storage_options carried");
-        assert_eq!(carried.get("endpoint").map(String::as_str), Some("http://minio:9000"));
+        assert_eq!(
+            carried.get("endpoint").map(String::as_str),
+            Some("http://minio:9000")
+        );
         assert_eq!(carried.get("region").map(String::as_str), Some("us-east-1"));
     }
 

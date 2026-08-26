@@ -107,6 +107,7 @@ jobs:
         echo "Tag will be: $TAG"
         echo "Version will be: $VERSION"
 
+    # bump_version.py now refreshes both Cargo.lock files after bumping.
     - name: Update version (when version changes)
       if: inputs.release_type != 'current'
       run: |
@@ -116,12 +117,6 @@ jobs:
       run: |
         git config user.name 'Lance Release Bot'
         git config user.email 'dev@lancedb.com'
-
-    - name: Update Cargo lock version (when version changes)
-      if: inputs.release_type != 'current'
-      run: |
-        cargo check --manifest-path crates/lance-graph/Cargo.toml
-        cargo check --manifest-path crates/lance-graph-python/Cargo.toml
 
     - name: Create release commit (when version changes)
       if: inputs.release_type != 'current'

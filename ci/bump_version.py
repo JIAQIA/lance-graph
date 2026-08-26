@@ -132,6 +132,12 @@ def main():
         new_version = get_current_version()
         print(f"\nSuccessfully updated version from {current_version} to {new_version}")
 
+        # bump-my-version only edits the manifests; both Cargo.lock files (the
+        # workspace lock and the workspace-excluded python crate lock) record the
+        # member package versions and would otherwise stay stale. Refresh them.
+        run_command(["cargo", "check", "--manifest-path", "Cargo.toml"])
+        run_command(["cargo", "check", "--manifest-path", "crates/lance-graph-python/Cargo.toml"])
+
 
 if __name__ == '__main__':
     main()

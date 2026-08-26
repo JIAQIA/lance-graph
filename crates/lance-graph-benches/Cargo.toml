@@ -6,8 +6,8 @@ publish = false
 description = "Benchmarks for lance-graph (not published)"
 
 [dependencies]
-lance-graph = { path = "../lance-graph", version = "0.5.3" }
-lance = "=1.0.4"
+lance-graph = { path = "../lance-graph" }
+lance = { workspace = true }
 arrow-array = "56.2"
 arrow-schema = "56.2"
 criterion = { version = "0.5", features = ["async", "async_tokio", "html_reports"] }

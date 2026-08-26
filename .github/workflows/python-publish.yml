@@ -18,17 +18,26 @@ on:
           - dry_run
           - release
 
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-C debuginfo=1"
+  RUST_BACKTRACE: "1"
+  CARGO_INCREMENTAL: "0"
+
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CARGO_TERM_COLOR: always
-      RUSTFLAGS: "-C debuginfo=1"
-      RUST_BACKTRACE: "1"
-      CARGO_INCREMENTAL: "0"
+  build:
+    name: Build ${{ matrix.target }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            build_sdist: true
+          - os: macos-14
+            target: aarch64-apple-darwin
+            build_sdist: false
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,10 +53,28 @@ jobs:
           toolchain: stable
           cache: false
 
-      - name: Install system dependencies
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            crates/lance-graph
+            crates/lance-graph-catalog
+            crates/lance-graph-python
+
+      - name: Install Rust target
+        env:
+          TARGET: ${{ matrix.target }}
+        run: rustup target add "$TARGET"
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt update
           sudo apt install -y protobuf-compiler libssl-dev
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install protobuf
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -56,21 +83,55 @@ jobs:
         run: |
           pip install maturin
 
+      # Native ubuntu-24.04 build tags the wheel manylinux_2_39 — parity with
+      # the upstream lance-graph 0.5.4 linux wheel (same tag), which is the
+      # version TFRobotServer already runs. For a wider manylinux2014 wheel,
+      # build inside ghcr.io/pyo3/maturin (requires ghcr access).
       - name: Build distributions
         working-directory: python
         run: |
-          make publish
+          if [ "${{ matrix.build_sdist }}" == "true" ]; then
+            maturin build --release --out dist --sdist
+          else
+            maturin build --release --out dist
+          fi
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
-          name: python-dist
+          name: python-dist-${{ matrix.target }}
           path: python/dist
 
+  publish:
+    if: >
+      (github.event_name == 'release' && github.event.action == 'released') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'release')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-dist-*
+          path: python/dist
+          merge-multiple: true
+
       - name: Publish to PyPI
-        if: >
-          (github.event_name == 'release' && github.event.action == 'released') ||
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'release')
         working-directory: python
         run: |
           uv publish --trusted-publishing always
