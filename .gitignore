@@ -56,3 +56,6 @@ Thumbs.db
 
 # Generated data
 knowledge_graph_data/
+
+# MCP tooling
+.playwright-mcp/
