@@ -8,11 +8,12 @@ members = [
 exclude = ["crates/lance-graph-python"]
 resolver = "2"
 
-# The lance family is pinned exactly (`=1.0.4`): the 1.0.x line has API drift
-# (e.g. `DatasetBuilder::from_namespace` went from 3 args in 1.0.1 to 2 in
-# 1.0.4). Single source of truth for the verified combination; see README
-# "Version constraints".
+# The lance family is pinned exactly (`=8.0.1`): lance majors are coupled to a
+# datafusion major (7/8 => datafusion 53, 9/10 => datafusion 54), and deltalake
+# (0.32.4) tops out at datafusion 53 — 8.0.1 is the newest lance line that shares
+# one datafusion with the `delta` feature. Single source of truth for the
+# verified combination; see README "Version constraints".
 [workspace.dependencies]
-lance = "=1.0.4"
-lance-linalg = "=1.0.4"
-lance-namespace = "=1.0.4"
+lance = "=8.0.1"
+lance-linalg = "=8.0.1"
+lance-namespace = "=8.0.1"

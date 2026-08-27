@@ -26,14 +26,18 @@ issue #92.
 ## Version constraints
 
 The `lance` family (`lance`, `lance-linalg`, `lance-namespace`) is pinned
-exactly to `=1.0.4` across the workspace (via `[workspace.dependencies]`) and in
-the Python wheel build (`crates/lance-graph-python/Cargo.lock`). The 1.0.x line
-is not API-stable: `DatasetBuilder::from_namespace` changed from 3 arguments in
-1.0.1 to 2 in 1.0.4, so mixing 1.0.x patch versions can fail to compile or fail
-at runtime. Bumping any of them requires re-verifying the full stack.
+exactly to `=8.0.1` across the workspace (via `[workspace.dependencies]`) and in
+the Python wheel build (`crates/lance-graph-python/Cargo.lock`). Lance major
+versions are coupled to a DataFusion major: 7.x/8.x require DataFusion 53.x,
+9.x/10.x require DataFusion 54.x, and the newest `deltalake` (0.32.4) supports
+only DataFusion up to 53.x. `8.0.1` is the newest lance line that can share a
+single DataFusion with `deltalake 0.32.4`, so the `delta` feature and the
+engine stay on one DataFusion/Arrow version. Bumping lance to 9.x/10.x requires
+bumping DataFusion to 54.x and a `deltalake` release that follows suit (or
+dropping the `delta` feature).
 
 Rust users that depend on `tf-lance-graph-catalog` directly should align their own
-`lance-namespace` to `=1.0.4`. If a different 1.0.x version is pulled in, Cargo
+`lance-namespace` to `=8.0.1`. If a different version is pulled in, Cargo
 may resolve two copies, and the `dyn LanceNamespace` trait identity is
 per-crate-version (symptoms: "trait not implemented" or type mismatches).
 Check with `cargo tree -d | grep lance-namespace`.

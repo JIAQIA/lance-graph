@@ -109,13 +109,29 @@ impl TableReader for DeltaTableReader {
             ))
         })?;
 
-        ctx.register_table(table_name, Arc::new(delta_table))
+        // deltalake 0.32 no longer implements `TableProvider` on `DeltaTable`
+        // directly; build a provider via `table_provider()` (async builder).
+        delta_table
+            .update_datafusion_session(&ctx.state())
             .map_err(|e| {
                 CatalogError::Other(format!(
-                    "Failed to register Delta table '{}': {}",
+                    "Failed to register object store for Delta table '{}': {}",
                     table_name, e
                 ))
             })?;
+        let provider = delta_table.table_provider().await.map_err(|e| {
+            CatalogError::Other(format!(
+                "Failed to build TableProvider for Delta table '{}': {}",
+                table_name, e
+            ))
+        })?;
+
+        ctx.register_table(table_name, provider).map_err(|e| {
+            CatalogError::Other(format!(
+                "Failed to register Delta table '{}': {}",
+                table_name, e
+            ))
+        })?;
 
         Ok(())
     }

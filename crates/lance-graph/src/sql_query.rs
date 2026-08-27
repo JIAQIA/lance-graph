@@ -172,7 +172,9 @@ async fn df_schema_from_ctx(ctx: &SessionContext, sql: &str) -> Result<Arc<arrow
         message: format!("Failed to plan SQL for schema: {}", e),
         location: snafu::Location::new(file!(), line!(), column!()),
     })?;
-    let arrow_schema = Arc::new(arrow_schema::Schema::from(df.schema()));
+    // datafusion 53 removed `From<&DFSchema> for Schema`; use the new
+    // `From<DFSchema> for SchemaRef` (clones the underlying Arrow schema).
+    let arrow_schema = arrow_schema::SchemaRef::from(df.schema().clone());
     normalize_schema(arrow_schema)
 }
 
