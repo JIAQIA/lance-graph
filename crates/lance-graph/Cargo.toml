@@ -1,6 +1,6 @@
 [package]
 name = "tf-lance-graph"
-version = "0.5.5"
+version = "0.6.0"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Lance Devs <dev@lancedb.com>"]
@@ -30,7 +30,7 @@ datafusion-expr = "53.1"
 datafusion-sql = "53.1"
 datafusion-functions-aggregate = "53.1"
 futures = "0.3"
-tf-lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.5.5" }
+tf-lance-graph-catalog = { path = "../lance-graph-catalog", version = "0.6.0" }
 lance = { workspace = true }
 lance-linalg = { workspace = true }
 lance-namespace = { workspace = true }

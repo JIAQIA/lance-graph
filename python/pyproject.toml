@@ -1,6 +1,6 @@
 [project]
 name = "tf-lance-graph"
-version = "0.5.5"
+version = "0.6.0"
 dependencies = [
     "pyarrow>=14",
     "pyyaml>=6.0",
