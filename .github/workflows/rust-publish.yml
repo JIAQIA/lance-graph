@@ -30,6 +30,11 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    # crates.io Trusted Publishing (OIDC): mint a short-lived token instead of
+    # relying on a long-lived CARGO_REGISTRY_TOKEN secret.
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,19 +52,31 @@ jobs:
 
       - uses: rui314/setup-mold@v1
 
-      # Publish lance-graph-catalog first: lance-graph's dependency requirement
-      # (^0.5.5 after path rewrite) must resolve on the registry before its own
-      # publish succeeds.
-      - uses: katyo/publish-crates@v2
-        with:
-          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          args: "--all-features"
-          path: crates/lance-graph-catalog
-          dry-run: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'dry_run') }}
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+        if: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'dry_run') }}
 
-      - uses: katyo/publish-crates@v2
-        with:
-          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          args: "--all-features"
-          path: crates/lance-graph
-          dry-run: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'dry_run') }}
+      # Publish lance-graph-catalog first: lance-graph's dependency requirement
+      # (^0.6.0 after path rewrite) must resolve on the registry before its own
+      # publish succeeds. cargo publish waits for index propagation itself.
+      - name: Publish tf-lance-graph-catalog
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ github.event.inputs.mode }}" = "dry_run" ]; then
+            EXTRA_ARGS="--dry-run"
+          fi
+          cargo publish -p tf-lance-graph-catalog --all-features $EXTRA_ARGS
+
+      - name: Publish tf-lance-graph
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ github.event.inputs.mode }}" = "dry_run" ]; then
+            EXTRA_ARGS="--dry-run"
+          fi
+          cargo publish -p tf-lance-graph --all-features $EXTRA_ARGS
