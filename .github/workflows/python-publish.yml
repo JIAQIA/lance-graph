@@ -17,6 +17,10 @@ on:
         options:
           - dry_run
           - release
+      backfill_ref:
+        description: "Backfill: git ref (tag or commit SHA) of an already-released version to build; when set, builds & publishes only the Linux aarch64 wheel for that ref"
+        required: false
+        default: ""
 
 env:
   CARGO_TERM_COLOR: always
@@ -27,12 +31,20 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.target }}
+    env:
+      # Backfill mode: build a previously-released version, e.g. to add a
+      # wheel for a platform that was missing at release time. Only the
+      # Linux aarch64 wheel is built; set `mode` to `release` to publish it.
+      BACKFILL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.backfill_ref != '' && github.event.inputs.backfill_ref || '' }}
     strategy:
       matrix:
         include:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             build_sdist: true
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            build_sdist: false
           - os: macos-14
             target: aarch64-apple-darwin
             build_sdist: false
@@ -41,6 +53,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Backfill mode: build the released version's exact tree.
+          ref: ${{ env.BACKFILL != '' && env.BACKFILL || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -83,11 +98,14 @@ jobs:
         run: |
           pip install maturin
 
-      # Native ubuntu-24.04 build tags the wheel manylinux_2_39 — parity with
-      # the upstream lance-graph 0.5.4 linux wheel (same tag), which is the
-      # version TFRobotServer already runs. For a wider manylinux2014 wheel,
-      # build inside ghcr.io/pyo3/maturin (requires ghcr access).
+      # Native ubuntu-24.04 / ubuntu-24.04-arm builds tag the wheels
+      # manylinux_2_39 (x86_64 / aarch64) — parity with the upstream
+      # lance-graph 0.5.4 linux wheel (same tag), which is the version
+      # TFRobotServer already runs. For a wider manylinux2014 wheel, build
+      # inside ghcr.io/pyo3/maturin (requires ghcr access).
       - name: Build distributions
+        # Backfill mode only builds the Linux aarch64 wheel.
+        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
         working-directory: python
         run: |
           if [ "${{ matrix.build_sdist }}" == "true" ]; then
@@ -96,7 +114,19 @@ jobs:
             maturin build --release --out dist
           fi
 
+      # Per-arch gate: install the built wheel in a fresh venv and import the
+      # package, so a broken wheel never reaches the publish step.
+      - name: Smoke test wheel (install + import)
+        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
+        shell: bash
+        run: |
+          python -m venv /tmp/wheel-check
+          /tmp/wheel-check/bin/pip install --no-deps python/dist/*.whl
+          /tmp/wheel-check/bin/pip install "pyarrow>=14"
+          /tmp/wheel-check/bin/python -c "import lance_graph, importlib.metadata as m; print(m.version('tf-lance-graph'))"
+
       - name: Upload distributions
+        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
         uses: actions/upload-artifact@v4
         with:
           name: python-dist-${{ matrix.target }}
