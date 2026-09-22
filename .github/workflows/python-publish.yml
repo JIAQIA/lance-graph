@@ -17,10 +17,6 @@ on:
         options:
           - dry_run
           - release
-      backfill_ref:
-        description: "Backfill: git ref (tag or commit SHA) of an already-released version to build; when set, builds & publishes only the Linux aarch64 wheel for that ref"
-        required: false
-        default: ""
 
 env:
   CARGO_TERM_COLOR: always
@@ -31,12 +27,12 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.target }}
-    env:
-      # Backfill mode: build a previously-released version, e.g. to add a
-      # wheel for a platform that was missing at release time. Only the
-      # Linux aarch64 wheel is built; set `mode` to `release` to publish it.
-      BACKFILL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.backfill_ref != '' && github.event.inputs.backfill_ref || '' }}
     strategy:
+      # Platform contract: every released version must ship all of these
+      # artifacts. The publish job enforces the set below (see "Verify
+      # artifact set"); if you change this matrix, change that gate in the
+      # same commit. A version that ships without linux aarch64 breaks
+      # downstream arm64 image builds — never release a partial set.
       matrix:
         include:
           - os: ubuntu-24.04
@@ -53,9 +49,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          # Backfill mode: build the released version's exact tree.
-          ref: ${{ env.BACKFILL != '' && env.BACKFILL || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -104,8 +97,6 @@ jobs:
       # TFRobotServer already runs. For a wider manylinux2014 wheel, build
       # inside ghcr.io/pyo3/maturin (requires ghcr access).
       - name: Build distributions
-        # Backfill mode only builds the Linux aarch64 wheel.
-        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
         working-directory: python
         run: |
           if [ "${{ matrix.build_sdist }}" == "true" ]; then
@@ -117,7 +108,6 @@ jobs:
       # Per-arch gate: install the built wheel in a fresh venv and import the
       # package, so a broken wheel never reaches the publish step.
       - name: Smoke test wheel (install + import)
-        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
         shell: bash
         run: |
           python -m venv /tmp/wheel-check
@@ -126,7 +116,6 @@ jobs:
           /tmp/wheel-check/bin/python -c "import lance_graph, importlib.metadata as m; print(m.version('tf-lance-graph'))"
 
       - name: Upload distributions
-        if: ${{ env.BACKFILL == '' || matrix.os == 'ubuntu-24.04-arm' }}
         uses: actions/upload-artifact@v4
         with:
           name: python-dist-${{ matrix.target }}
@@ -160,6 +149,49 @@ jobs:
           pattern: python-dist-*
           path: python/dist
           merge-multiple: true
+
+      # Pre-upload gate. A PyPI release's file set is effectively frozen from
+      # the moment it is first fetched: resolvers cache the index page per
+      # package with no TTL (poetry in particular), so a wheel uploaded later
+      # is silently dropped by any lockfile written before it. That is why
+      # backfilling a platform after the fact does not work, and why there is
+      # no backfill path in this workflow — a version missing a platform is
+      # fixed by cutting a patch release instead (PyPI also rejects new files
+      # on releases older than 14 days).
+      #
+      # This step fails the publish before upload if the built artifact set is
+      # incomplete, e.g. a matrix entry was dropped or a wheel's tag changed.
+      - name: Verify artifact set
+        working-directory: python/dist
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          required=(
+            "*-cp39-abi3-manylinux_2_39_x86_64.whl:linux x86_64"
+            "*-cp39-abi3-manylinux_2_39_aarch64.whl:linux aarch64"
+            "*-cp39-abi3-macosx_11_0_arm64.whl:macOS arm64"
+            "*.tar.gz:sdist"
+          )
+
+          fail=0
+          for entry in "${required[@]}"; do
+            pattern="${entry%%:*}"
+            label="${entry##*:}"
+            matches=( $pattern )
+            if [ ${#matches[@]} -eq 0 ]; then
+              echo "::error::incomplete artifact set: missing $label ($pattern)"
+              fail=1
+            else
+              printf 'ok  %-14s %s\n' "$label" "${matches[0]}"
+            fi
+          done
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::refusing to upload an incomplete artifact set; fix the build matrix and cut a patch release — do NOT backfill an already-released version"
+            exit 1
+          fi
 
       - name: Publish to PyPI
         working-directory: python
